@@ -1,43 +1,55 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #fef6ff;
-  color: #333;
   margin: 0;
-  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #fff8f3;
+  color: #2e2e2e;
   transition: background 0.3s, color 0.3s;
 }
-
-header, footer {
-  background-color: #e0cffe;
+header {
+  background: #eac7ff;
   padding: 1rem;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-nav a {
-  margin: 0 10px;
+header nav a {
+  margin: 0 0.5rem;
   text-decoration: none;
-  color: #5e3c9c;
+  color: #4b0082;
+  font-weight: 500;
+}
+main {
+  padding: 1.5rem;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #f0cfff;
 }
 
-button {
-  margin-top: 10px;
-  padding: 0.5rem;
-  background: #d1b3ff;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.dark-mode {
-  background: #1e1e2f;
+body.dark {
+  background: #1f1f2f;
   color: #eee;
 }
-
-.dark-mode header,
-.dark-mode footer {
-  background-color: #312b4f;
+body.dark header {
+  background: #3a2a52;
 }
-
-.dark-mode nav a {
-  color: #c7afff;
+body.dark .card {
+  background: #2e2e3f;
+  color: #eee;
+}
+body.dark footer {
+  background: #3a2a52;
 }
