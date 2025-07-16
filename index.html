@@ -2,47 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Srikari T. | College Hub</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Srikari's College Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body class="light-mode">
+<body>
   <header>
-    <h1>Welcome to Srikari's Digital Hub 👋</h1>
+    <h1>Welcome, Srikari 👋</h1>
+    <button id="toggleTheme">🌙</button>
     <nav>
       <a href="index.html">Home</a>
       <a href="notes.html">Notes</a>
       <a href="projects.html">Projects</a>
       <a href="todo.html">To-Do</a>
-      <a href="resume.html">Resume</a>
-      <a href="courses.html">Courses</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="links.html">Links</a>
-      <a href="blog.html">Blog</a>
-      <a href="scores.html">Scores</a>
       <a href="assignments.html">Assignments</a>
-      <a href="private.html">Private</a>
+      <a href="scores.html">Scores</a>
     </nav>
-    <button id="themeToggle">🌙 Toggle Dark Mode</button>
   </header>
-
   <main>
-    <section>
-      <h2>Hey, I'm Srikari 👨‍💻</h2>
-      <p>CS student @ VNR VJIET. I build useful tools for myself, learn cool things, and keep it organized right here 💡</p>
+    <section class="card">
+      <h2>Your Digital Life</h2>
+      <p>Organized. Productive. Aesthetic.</p>
+    </section>
+    <section class="grid">
+      <div class="card"><h3>📚 Notes</h3><p>All your subject-wise notes.</p></div>
+      <div class="card"><h3>🧠 Projects</h3><p>Track ideas and submissions.</p></div>
+      <div class="card"><h3>✅ To-Do</h3><p>Stay on top of daily tasks.</p></div>
+      <div class="card"><h3>📅 Assignments</h3><p>Upcoming due dates at a glance.</p></div>
+      <div class="card"><h3>📊 Scores</h3><p>Track your progress.</p></div>
     </section>
   </main>
-
   <footer>
-    <p>&copy; 2025 Srikari T. All rights reserved.</p>
+    <p>&copy; 2025 Srikari T.</p>
   </footer>
-
-  <script>
-    const toggle = document.getElementById("themeToggle");
-    toggle.onclick = () => {
-      document.body.classList.toggle("dark-mode");
-    };
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-<!-- index.html - Replace this placeholder with your actual content -->
