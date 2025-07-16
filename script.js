@@ -1,1 +1,4 @@
-<!-- script.js - Replace this placeholder with your actual content -->
+
+document.getElementById("toggleTheme").onclick = () => {
+  document.body.classList.toggle("dark");
+};
