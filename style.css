@@ -1,0 +1,43 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #fef6ff;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+header, footer {
+  background-color: #e0cffe;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #5e3c9c;
+}
+
+button {
+  margin-top: 10px;
+  padding: 0.5rem;
+  background: #d1b3ff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.dark-mode {
+  background: #1e1e2f;
+  color: #eee;
+}
+
+.dark-mode header,
+.dark-mode footer {
+  background-color: #312b4f;
+}
+
+.dark-mode nav a {
+  color: #c7afff;
+}
