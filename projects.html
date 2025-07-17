@@ -1,1 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Projects</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg-light: #fefefe;
+      --bg-dark: #1e1e1e;
+      --text-light: #000;
+      --text-dark: #fff;
+      --accent: #c5a3ff;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: 0.3s;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--accent);
+      color: white;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 24px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.3s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    input:checked + .slider {
+      background-color: #555;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    main {
+      padding: 1rem 2rem;
+    }
+
+    h2 {
+      color: var(--accent);
+    }
+
+    .project-card {
+      background: #fff;
+      border: 2px solid #ddd;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    body.dark .project-card {
+      background: #2c2c2c;
+      border-color: #444;
+    }
+
+    .checklist, .add-project {
+      margin-top: 2rem;
+    }
+
+    .checklist ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+    }
+
+    .checklist input[type="checkbox"] {
+      margin-right: 0.75rem;
+    }
+
+    .add-project input {
+      padding: 0.5rem;
+      width: 70%;
+      margin-right: 0.5rem;
+    }
+
+    .add-project button {
+      padding: 0.5rem 1rem;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .delete {
+      margin-left: auto;
+      color: red;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Projects</h1>
+    <div class="toggle">
+      <label class="switch">
+        <input type="checkbox" id="darkToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <section class="demo-projects">
+      <h2>Featured Projects</h2>
+
+      <div class="project-card">
+        <h3>Portfolio Website</h3>
+        <p>This personal website with dark mode, to-do, notes, projects, and more!</p>
+        <p><strong>Tech:</strong> HTML, CSS, JS</p>
+        <a href="#">🔗 GitHub</a>
+      </div>
+
+      <div class="project-card">
+        <h3>Pomodoro Timer</h3>
+        <p>A productivity timer with countdown and sessions.</p>
+        <p><strong>Tech:</strong> JavaScript</p>
+        <a href="#">🔗 GitHub</a>
+      </div>
+    </section>
+
+    <section class="checklist">
+      <h2>🧠 Project Ideas & Checklist</h2>
+      <ul id="ideaList"></ul>
+    </section>
+
+    <section class="add-project">
+      <h3>Add New Idea</h3>
+      <input type="text" id="ideaInput" placeholder="E.g. Build a quiz game" />
+      <button onclick="addIdea()">Add</button>
+    </section>
+  </main>
+
+  <script>
+    const toggle = document.getElementById('darkToggle');
+    const body = document.body;
+
+    // Initialize theme
+    if (localStorage.getItem('darkMode') === 'true') {
+      body.classList.add('dark');
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener('change', () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('darkMode', body.classList.contains('dark'));
+    });
+
+    const ideaList = document.getElementById('ideaList');
+    const input = document.getElementById('ideaInput');
+
+    function loadIdeas() {
+      const ideas = JSON.parse(localStorage.getItem('ideas') || '[]');
+      ideaList.innerHTML = '';
+      ideas.forEach((idea, index) => {
+        const li = document.createElement('li');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = idea.done;
+        checkbox.addEventListener('change', () => {
+          ideas[index].done = checkbox.checked;
+          localStorage.setItem('ideas', JSON.stringify(ideas));
+        });
+
+        const span = document.createElement('span');
+        span.textContent = idea.text;
+
+        const del = document.createElement('span');
+        del.textContent = '🗑️';
+        del.className = 'delete';
+        del.addEventListener('click', () => {
+          ideas.splice(index, 1);
+          localStorage.setItem('ideas', JSON.stringify(ideas));
+          loadIdeas();
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(del);
+        ideaList.appendChild(li);
+      });
+    }
+
+    function addIdea() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      const ideas = JSON.parse(localStorage.getItem('ideas') || '[]');
+      ideas.push({ text, done: false });
+      localStorage.setItem('ideas', JSON.stringify(ideas));
+      input.value = '';
+      loadIdeas();
+    }
+
+    window.onload = loadIdeas;
+  </script>
+</body>
+</html>
 <!-- projects.html - Replace this placeholder with your actual content -->
