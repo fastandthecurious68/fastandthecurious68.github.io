@@ -3,38 +3,181 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Srikari's College Dashboard</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Welcome, Srikari 👋</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #fff7f0;
+      color: #222;
+      transition: 0.3s;
+    }
+
+    body.dark {
+      background: #1e1e1e;
+      color: #eee;
+    }
+
+    /* Dark mode toggle switch */
+    .toggle-switch {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      z-index: 1000;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #f2c1f0;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #444;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    body.dark .card {
+      background: #2c2c2c;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- 🌙 Dark Mode Toggle -->
+  <label class="toggle-switch">
+    <input type="checkbox" id="toggleDark">
+    <span class="slider"></span>
+  </label>
+
+  <!-- 👋 Welcome Header -->
   <header>
     <h1>Welcome, Srikari 👋</h1>
-    <button id="toggleTheme">🌙</button>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="notes.html">Notes</a>
-      <a href="projects.html">Projects</a>
-      <a href="todo.html">To-Do</a>
-      <a href="assignments.html">Assignments</a>
-      <a href="scores.html">Scores</a>
-    </nav>
   </header>
-  <main>
-    <section class="card">
-      <h2>Your Digital Life</h2>
-      <p>Organized. Productive. Aesthetic.</p>
-    </section>
-    <section class="grid">
-      <div class="card"><h3>📚 Notes</h3><p>All your subject-wise notes.</p></div>
-      <div class="card"><h3>🧠 Projects</h3><p>Track ideas and submissions.</p></div>
-      <div class="card"><h3>✅ To-Do</h3><p>Stay on top of daily tasks.</p></div>
-      <div class="card"><h3>📅 Assignments</h3><p>Upcoming due dates at a glance.</p></div>
-      <div class="card"><h3>📊 Scores</h3><p>Track your progress.</p></div>
-    </section>
-  </main>
-  <footer>
-    <p>&copy; 2025 Srikari T.</p>
-  </footer>
-  <script src="script.js"></script>
+
+  <!-- 🎯 Hero Section -->
+  <section class="hero">
+    <h2>Your Digital Life</h2>
+    <p>Organized. Productive. Aesthetic.</p>
+  </section>
+
+  <!-- 🧭 Navigation Cards -->
+  <section class="cards">
+    <a href="notes.html" class="card">
+      <div>📚</div>
+      <h3>Notes</h3>
+      <p>All your subject-wise notes.</p>
+    </a>
+
+    <a href="projects.html" class="card">
+      <div>🧠</div>
+      <h3>Projects</h3>
+      <p>Track ideas and submissions.</p>
+    </a>
+
+    <a href="todo.html" class="card">
+      <div>✅</div>
+      <h3>To-Do</h3>
+      <p>Stay on top of daily tasks.</p>
+    </a>
+
+    <a href="assignments.html" class="card">
+      <div>📅</div>
+      <h3>Assignments</h3>
+      <p>Upcoming due dates at a glance.</p>
+    </a>
+
+    <a href="scores.html" class="card">
+      <div>📊</div>
+      <h3>Scores</h3>
+      <p>Track your academic performance.</p>
+    </a>
+
+    <a href="timer.html" class="card">
+      <div>⏳</div>
+      <h3>Timer</h3>
+      <p>Pomodoro / Stopwatch tools.</p>
+    </a>
+
+    <a href="flashcards.html" class="card">
+      <div>🗂️</div>
+      <h3>Flashcards</h3>
+      <p>Revise topics with custom decks.</p>
+    </a>
+
+    <a href="themes.html" class="card">
+      <div>🎨</div>
+      <h3>Theme Mood</h3>
+      <p>Change vibes based on your mood.</p>
+    </a>
+  </section>
+
+  <!-- 📜 JavaScript -->
+  <script>
+    const toggleSwitch = document.getElementById("toggleDark");
+    toggleSwitch.addEventListener("change", () => {
+      document.body.classList.toggle("dark");
+    });
+  </script>
+
 </body>
 </html>
