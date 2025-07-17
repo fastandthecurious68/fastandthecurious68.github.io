@@ -1,1 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="styles.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    :root {
+      --bg: #fdfcfc;
+      --text: #111;
+      --card: #ffffff;
+      --accent: #a8dadc;
+    }
+
+    .dark-mode {
+      --bg: #1e1e2f;
+      --text: #f5f5f5;
+      --card: #2c2c3a;
+      --accent: #5cd6c0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .toggle {
+      appearance: none;
+      width: 50px;
+      height: 25px;
+      background-color: var(--accent);
+      border-radius: 25px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .toggle::before {
+      content: '';
+      position: absolute;
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background-color: #fff;
+      top: 1px;
+      left: 1px;
+      transition: 0.3s;
+    }
+
+    .toggle:checked::before {
+      transform: translateX(25px);
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    input, select, button {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .green { background-color: #d4edda; }
+    .yellow { background-color: #fff3cd; }
+    .red { background-color: #f8d7da; }
+
+    .collapsible {
+      background: var(--accent);
+      color: black;
+      border: none;
+      padding: 10px;
+      text-align: left;
+      font-size: 1rem;
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .content {
+      display: none;
+      overflow: hidden;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>Scores</h2>
+    <label>
+      <input type="checkbox" class="toggle" id="darkModeToggle">
+    </label>
+  </header>
+
+  <div class="card">
+    <h3>Add New Score</h3>
+    <div class="form-row">
+      <input type="text" id="subject" placeholder="Subject">
+      <input type="text" id="testType" placeholder="Test Type">
+      <input type="number" id="score" placeholder="Score">
+      <input type="number" id="maxScore" placeholder="Max Score">
+      <input type="date" id="testDate">
+      <button onclick="addScore()">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Upcoming Tests</h3>
+    <ul id="upcomingList"></ul>
+  </div>
+
+  <div class="card">
+    <h3>Score Chart</h3>
+    <canvas id="scoreChart"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>All Scores</h3>
+    <div>
+      <input type="text" id="searchBox" placeholder="Search...">
+      <button onclick="exportScores()">Export JSON</button>
+      <input type="file" id="importFile" onchange="importScores()" style="display:inline;">
+    </div>
+    <div id="scoreContainer"></div>
+  </div>
+
+  <div class="card">
+    <h3>Progress Tracker</h3>
+    <p id="averageScore">Average: --%</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const darkToggle = document.getElementById('darkModeToggle');
+    darkToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark-mode', darkToggle.checked);
+      localStorage.setItem('dark-mode', darkToggle.checked);
+    });
+
+    if (localStorage.getItem('dark-mode') === 'true') {
+      darkToggle.checked = true;
+      document.body.classList.add('dark-mode');
+    }
+
+    let scores = JSON.parse(localStorage.getItem('scores') || '[]');
+
+    function addScore() {
+      const subject = document.getElementById('subject').value.trim();
+      const testType = document.getElementById('testType').value.trim();
+      const score = parseFloat(document.getElementById('score').value);
+      const maxScore = parseFloat(document.getElementById('maxScore').value);
+      const date = document.getElementById('testDate').value;
+
+      if (!subject || !testType || isNaN(score) || isNaN(maxScore) || !date) return;
+
+      const percentage = ((score / maxScore) * 100).toFixed(2);
+      scores.push({ subject, testType, score, maxScore, percentage, date });
+      saveAndRender();
+    }
+
+    function deleteScore(index) {
+      scores.splice(index, 1);
+      saveAndRender();
+    }
+
+    function exportScores() {
+      const blob = new Blob([JSON.stringify(scores)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'scores.json';
+      a.click();
+    }
+
+    function importScores() {
+      const file = document.getElementById('importFile').files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        scores = JSON.parse(reader.result);
+        saveAndRender();
+      };
+      reader.readAsText(file);
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('scores', JSON.stringify(scores));
+      renderScores();
+      renderChart();
+    }
+
+    function renderScores() {
+      const container = document.getElementById('scoreContainer');
+      container.innerHTML = '';
+      const search = document.getElementById('searchBox').value.toLowerCase();
+
+      const subjects = [...new Set(scores.map(s => s.subject))];
+      let total = 0;
+
+      subjects.forEach(subject => {
+        const filtered = scores.filter(s => s.subject === subject && JSON.stringify(s).toLowerCase().includes(search));
+        if (!filtered.length) return;
+
+        const collapsible = document.createElement('button');
+        collapsible.textContent = subject;
+        collapsible.className = 'collapsible';
+        const content = document.createElement('div');
+        content.className = 'content';
+
+        let subjectTotal = 0;
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+          <tr>
+            <th>Type</th><th>Score</th><th>Max</th><th>%</th><th>Date</th><th>Delete</th>
+          </tr>`;
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        filtered.forEach((s, i) => {
+          const tr = document.createElement('tr');
+          tr.className = s.percentage >= 80 ? 'green' : s.percentage >= 50 ? 'yellow' : 'red';
+          tr.innerHTML = `
+            <td>${s.testType}</td>
+            <td>${s.score}</td>
+            <td>${s.maxScore}</td>
+            <td>${s.percentage}%</td>
+            <td>${s.date}</td>
+            <td><button onclick="deleteScore(${scores.indexOf(s)})">❌</button></td>
+          `;
+          tbody.appendChild(tr);
+          subjectTotal += parseFloat(s.percentage);
+        });
+
+        table.appendChild(tbody);
+        content.appendChild(table);
+        const avg = (subjectTotal / filtered.length).toFixed(2);
+        content.innerHTML += `<p><strong>Average:</strong> ${avg}%</p>`;
+
+        collapsible.addEventListener('click', () => {
+          content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+
+        container.appendChild(collapsible);
+        container.appendChild(content);
+        total += subjectTotal;
+      });
+
+      const avgAll = scores.length ? (total / scores.length).toFixed(2) : '--';
+      document.getElementById('averageScore').textContent = `Average: ${avgAll}%`;
+
+      // Upcoming tests
+      const upcoming = scores.filter(s => new Date(s.date) > new Date());
+      const ul = document.getElementById('upcomingList');
+      ul.innerHTML = '';
+      upcoming.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = `${s.subject} - ${s.testType} on ${s.date}`;
+        ul.appendChild(li);
+      });
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById('scoreChart').getContext('2d');
+      const labels = scores.map((s, i) => `${s.subject} (${s.date})`);
+      const data = scores.map(s => s.percentage);
+
+      if (window.scoreChart) window.scoreChart.destroy();
+
+      window.scoreChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Percentage',
+            data,
+            fill: false,
+            borderColor: 'rgba(75,192,192,1)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    }
+
+    document.getElementById('searchBox').addEventListener('input', renderScores);
+
+    renderScores();
+    renderChart();
+  </script>
+</body>
+</html>
 <!-- scores.html - Replace this placeholder with your actual content -->
