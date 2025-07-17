@@ -1,1 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do | fastandthecurious68</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-light: #fef6fb;
+      --bg-dark: #1f1f1f;
+      --card-light: #ffffff;
+      --card-dark: #2a2a2a;
+      --text-light: #333;
+      --text-dark: #f1f1f1;
+      --accent: #b388eb;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--accent);
+      color: white;
+    }
+
+    .dark header {
+      background: #7448c2;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      border-radius: 20px;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4caf50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .container {
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    form {
+      display: grid;
+      gap: 0.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      background: var(--card-light);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .dark form {
+      background: var(--card-dark);
+    }
+
+    input, select {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 0.5rem;
+      border: none;
+      background-color: var(--accent);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .task {
+      background: var(--card-light);
+      margin: 0.5rem 0;
+      padding: 1rem;
+      border-radius: 10px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.2s;
+    }
+
+    .dark .task {
+      background: var(--card-dark);
+    }
+
+    .task.done {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .task-info {
+      flex: 1;
+    }
+
+    .delete {
+      background: none;
+      color: red;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      margin-top: 1rem;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+    }
+
+    .progress {
+      background: var(--accent);
+      height: 100%;
+      width: 0;
+      transition: 0.3s;
+    }
+
+    @media (max-width: 500px) {
+      .task {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .task-info {
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>📋 To-Do</h2>
+    <div class="toggle-container">
+      <span>🌙</span>
+      <label class="switch">
+        <input type="checkbox" id="mode-toggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="container">
+    <form id="task-form">
+      <input type="text" id="task" placeholder="Task name" required />
+      <input type="date" id="due" />
+      <select id="priority">
+        <option value="Low">Low Priority</option>
+        <option value="Medium" selected>Medium Priority</option>
+        <option value="High">High Priority</option>
+      </select>
+      <select id="category">
+        <option value="Personal">Personal</option>
+        <option value="College">College</option>
+        <option value="Project">Project</option>
+      </select>
+      <button type="submit">Add Task</button>
+    </form>
+
+    <div id="tasks"></div>
+
+    <div class="progress-bar">
+      <div class="progress" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("task-form");
+    const tasksDiv = document.getElementById("tasks");
+    const progress = document.getElementById("progress-bar");
+    const toggle = document.getElementById("mode-toggle");
+
+    // Load theme
+    if (localStorage.getItem("dark") === "true") {
+      document.body.classList.add("dark");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("dark", document.body.classList.contains("dark"));
+    });
+
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    function renderTasks() {
+      tasksDiv.innerHTML = "";
+      let doneCount = 0;
+      tasks.forEach((task, i) => {
+        const el = document.createElement("div");
+        el.className = "task" + (task.done ? " done" : "");
+        el.innerHTML = `
+          <div class="task-info">
+            <input type="checkbox" ${task.done ? "checked" : ""} onchange="toggleDone(${i})" />
+            <strong>${task.text}</strong> - ${task.category} | ${task.priority} | Due: ${task.due || "—"}
+          </div>
+          <button class="delete" onclick="deleteTask(${i})">🗑</button>
+        `;
+        tasksDiv.appendChild(el);
+        if (task.done) doneCount++;
+      });
+      progress.style.width = tasks.length
+        ? (doneCount / tasks.length) * 100 + "%"
+        : "0%";
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function toggleDone(i) {
+      tasks[i].done = !tasks[i].done;
+      renderTasks();
+    }
+
+    function deleteTask(i) {
+      tasks.splice(i, 1);
+      renderTasks();
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newTask = {
+        text: document.getElementById("task").value,
+        due: document.getElementById("due").value,
+        priority: document.getElementById("priority").value,
+        category: document.getElementById("category").value,
+        done: false,
+      };
+      tasks.push(newTask);
+      form.reset();
+      renderTasks();
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>
 
