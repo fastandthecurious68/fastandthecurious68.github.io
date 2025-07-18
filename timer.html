@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timer Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fef6f9;
+      --card: #ffffff;
+      --text: #333;
+      --accent: #ffd1dc;
+      --btn: #ffc0cb;
+      --border: #ddd;
+      --dark-bg: #1e1e1e;
+      --dark-card: #2a2a2a;
+      --dark-text: #eee;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    .dark-mode {
+      --bg: #1e1e1e;
+      --card: #2a2a2a;
+      --text: #eee;
+      --accent: #ff99ac;
+      --btn: #ff4e6a;
+      --border: #444;
+    }
+
+    header {
+      background: var(--accent);
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .container {
+      padding: 2rem;
+      display: grid;
+      gap: 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .timers button, .settings button {
+      padding: 0.5rem 1rem;
+      border: none;
+      margin: 0.5rem;
+      background: var(--btn);
+      color: var(--text);
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .time-display {
+      font-size: 2rem;
+      margin: 1rem 0;
+    }
+
+    input, select {
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .focus-mode {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .quote {
+      font-size: 2rem;
+      margin-top: 2rem;
+    }
+
+    .graph-container {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .toggle {
+      float: right;
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+
+    .alert {
+      color: red;
+      font-weight: bold;
+    }
+
+    .analytics {
+      font-size: 0.9rem;
+    }
+
+    .card.challenge {
+      border-left: 5px solid var(--accent);
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Timer & Focus Dashboard
+    <span class="toggle" onclick="toggleDarkMode()">🌓</span>
+  </header>
+
+  <div class="container">
+
+    <!-- Stopwatch -->
+    <div class="card">
+      <h2>⏱️ Stopwatch</h2>
+      <div class="time-display" id="stopwatchDisplay">00:00:00</div>
+      <div class="timers">
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="pauseStopwatch()">Pause</button>
+        <button onclick="resetStopwatch()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="card">
+      <h2>⏳ Countdown Timer</h2>
+      <input type="number" id="countdownInput" placeholder="Enter time in seconds" />
+      <div class="time-display" id="countdownDisplay">00:00</div>
+      <div class="timers">
+        <button onclick="startCountdown()">Start</button>
+        <button onclick="resetCountdown()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Pomodoro -->
+    <div class="card">
+      <h2>🍅 Pomodoro Timer</h2>
+      <div class="time-display" id="pomodoroDisplay">25:00</div>
+      <div class="timers">
+        <button onclick="startPomodoro()">Start</button>
+        <button onclick="pausePomodoro()">Pause</button>
+        <button onclick="resetPomodoro()">Reset</button>
+      </div>
+      <div class="analytics" id="pomodoroStats"></div>
+    </div>
+
+    <!-- Focus Mode -->
+    <div class="card">
+      <h2>🎯 Focus Mode</h2>
+      <div class="timers">
+        <button onclick="enterFocusMode()">Enter Focus Mode</button>
+        <button onclick="toggleDND()">Toggle Do Not Disturb</button>
+      </div>
+    </div>
+
+    <!-- Mood Themes + Sounds -->
+    <div class="card">
+      <h2>🎵 Mood & Sounds</h2>
+      <select onchange="changeMood(this.value)">
+        <option disabled selected>Choose a mood</option>
+        <option>Happy</option>
+        <option>Chill</option>
+        <option>Focused</option>
+      </select>
+      <select onchange="playSound(this.value)">
+        <option disabled selected>Play Ambient Sound</option>
+        <option value="rain">Rain</option>
+        <option value="cafe">Cafe</option>
+        <option value="forest">Forest</option>
+      </select>
+    </div>
+
+    <!-- Study Challenges -->
+    <div class="card challenge">
+      <h2>🎮 Mini Study Challenges</h2>
+      <ul>
+        <li>25-min Deep Work session</li>
+        <li>Finish 3 Pomodoros today</li>
+        <li>No social media for 1 hour</li>
+      </ul>
+    </div>
+
+    <!-- Analytics -->
+    <div class="card">
+      <h2>📈 Daily Analytics</h2>
+      <canvas id="analyticsChart" width="400" height="200"></canvas>
+    </div>
+
+  </div>
+
+  <div class="focus-mode" id="focusOverlay">
+    <h1>🧘 Focus Mode</h1>
+    <div class="quote" id="focusQuote">"Stay focused. Stay humble."</div>
+    <button onclick="exitFocusMode()">Exit</button>
+  </div>
+
+  <audio id="rain" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+  <audio id="cafe" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" loop></audio>
+  <audio id="forest" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" loop></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Dark mode toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    // Stopwatch
+    let stopwatchTime = 0, stopwatchRunning = false, stopwatchInterval;
+    function formatTime(t) {
+      const h = String(Math.floor(t / 3600)).padStart(2, '0');
+      const m = String(Math.floor((t % 3600) / 60)).padStart(2, '0');
+      const s = String(t % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+    function startStopwatch() {
+      if (!stopwatchRunning) {
+        stopwatchRunning = true;
+        stopwatchInterval = setInterval(() => {
+          stopwatchTime++;
+          document.getElementById('stopwatchDisplay').innerText = formatTime(stopwatchTime);
+        }, 1000);
+      }
+    }
+    function pauseStopwatch() {
+      clearInterval(stopwatchInterval);
+      stopwatchRunning = false;
+    }
+    function resetStopwatch() {
+      pauseStopwatch();
+      stopwatchTime = 0;
+      document.getElementById('stopwatchDisplay').innerText = '00:00:00';
+    }
+
+    // Countdown
+    let countdownInterval;
+    function startCountdown() {
+      let t = parseInt(document.getElementById('countdownInput').value);
+      countdownInterval = setInterval(() => {
+        if (t <= 0) {
+          clearInterval(countdownInterval);
+          alert("⏰ Time's up!");
+        }
+        document.getElementById('countdownDisplay').innerText = formatTime(t);
+        t--;
+      }, 1000);
+    }
+    function resetCountdown() {
+      clearInterval(countdownInterval);
+      document.getElementById('countdownDisplay').innerText = '00:00';
+    }
+
+    // Pomodoro
+    let pomoTime = 1500, pomoRunning = false, pomoInterval, pomoRounds = 0;
+    function startPomodoro() {
+      if (!pomoRunning) {
+        pomoRunning = true;
+        pomoInterval = setInterval(() => {
+          if (pomoTime <= 0) {
+            pomoRounds++;
+            document.getElementById('pomodoroStats').innerText = `✅ Rounds completed: ${pomoRounds}`;
+            pomoTime = pomoRounds % 4 === 0 ? 900 : 300;
+          }
+          document.getElementById('pomodoroDisplay').innerText = formatTime(pomoTime);
+          pomoTime--;
+        }, 1000);
+      }
+    }
+    function pausePomodoro() {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+    }
+    function resetPomodoro() {
+      pausePomodoro();
+      pomoTime = 1500;
+      pomoRounds = 0;
+      document.getElementById('pomodoroDisplay').innerText = '25:00';
+      document.getElementById('pomodoroStats').innerText = '';
+    }
+
+    // Focus Mode
+    function enterFocusMode() {
+      document.getElementById('focusOverlay').style.display = 'flex';
+    }
+    function exitFocusMode() {
+      document.getElementById('focusOverlay').style.display = 'none';
+    }
+    function toggleDND() {
+      alert("🔕 DND Mode is ON (mute notifications manually)");
+    }
+
+    // Mood and Sounds
+    function changeMood(mood) {
+      const colors = {
+        Happy: '#fff4e6',
+        Chill: '#e6f7f9',
+        Focused: '#f3f0ff'
+      };
+      document.body.style.background = colors[mood] || '#fff';
+    }
+    function playSound(type) {
+      ['rain', 'cafe', 'forest'].forEach(id => document.getElementById(id).pause());
+      if (type) document.getElementById(type).play();
+    }
+
+    // Chart
+    const ctx = document.getElementById('analyticsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+          label: 'Minutes Studied',
+          data: [25, 50, 30, 60, 45, 75, 90],
+          backgroundColor: '#ffc0cb'
+        }]
+      },
+      options: { responsive: true }
+    });
+  </script>
+</body>
+</html>
