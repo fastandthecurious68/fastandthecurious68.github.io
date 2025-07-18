@@ -1,356 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Timer Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Timer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
-      --bg: #fef6f9;
-      --card: #ffffff;
+      --bg: #fdf6f0;
       --text: #333;
-      --accent: #ffd1dc;
-      --btn: #ffc0cb;
-      --border: #ddd;
-      --dark-bg: #1e1e1e;
-      --dark-card: #2a2a2a;
-      --dark-text: #eee;
+      --card: #ffffff;
+      --accent: #f7c8e0;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1e1e2f;
+      --text: #f0f0f0;
+      --card: #2e2e3f;
+      --accent: #d37fa0;
     }
 
     body {
-      font-family: 'Nunito', sans-serif;
-      margin: 0;
       background: var(--bg);
       color: var(--text);
-      transition: all 0.3s ease;
-    }
-
-    .dark-mode {
-      --bg: #1e1e1e;
-      --card: #2a2a2a;
-      --text: #eee;
-      --accent: #ff99ac;
-      --btn: #ff4e6a;
-      --border: #444;
-    }
-
-    header {
-      background: var(--accent);
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
       padding: 1rem;
+    }
+
+    h1, h2 {
       text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 999;
     }
 
-    .container {
-      padding: 2rem;
-      display: grid;
-      gap: 2rem;
-    }
-
-    .card {
+    .timer-section {
       background: var(--card);
-      border: 1px solid var(--border);
+      padding: 1rem;
+      margin: 1rem auto;
       border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    h2 {
-      margin-top: 0;
-    }
-
-    .timers button, .settings button {
-      padding: 0.5rem 1rem;
+    .btn {
+      background: var(--accent);
       border: none;
-      margin: 0.5rem;
-      background: var(--btn);
-      color: var(--text);
-      border-radius: 5px;
+      color: white;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem;
       cursor: pointer;
-    }
-
-    .time-display {
-      font-size: 2rem;
-      margin: 1rem 0;
-    }
-
-    input, select {
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      border: 1px solid var(--border);
       border-radius: 5px;
+    }
+
+    .flex {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0.5rem 0;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .sound-select, .theme-select {
+      margin-top: 0.5rem;
+      padding: 0.4rem;
       width: 100%;
     }
 
-    .label {
-      font-weight: bold;
+    .progress-bar {
+      height: 10px;
+      background: lightgray;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 1rem;
     }
 
-    .focus-mode {
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+    }
+
+    .fullscreen {
       position: fixed;
-      inset: 0;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
       background: var(--bg);
-      display: none;
-      flex-direction: column;
+      color: var(--text);
+      display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
-    }
-
-    .quote {
       font-size: 2rem;
-      margin-top: 2rem;
-    }
-
-    .graph-container {
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .toggle {
-      float: right;
-      margin-right: 1rem;
-      cursor: pointer;
-    }
-
-    .alert {
-      color: red;
-      font-weight: bold;
-    }
-
-    .analytics {
-      font-size: 0.9rem;
-    }
-
-    .card.challenge {
-      border-left: 5px solid var(--accent);
-    }
-
-    audio {
-      display: none;
+      z-index: 999;
     }
   </style>
 </head>
-<body>
-  <header>
-    Timer & Focus Dashboard
-    <span class="toggle" onclick="toggleDarkMode()">🌓</span>
-  </header>
+<body data-theme="light">
+  <h1>⏳ Timer Dashboard</h1>
 
-  <div class="container">
-
-    <!-- Stopwatch -->
-    <div class="card">
-      <h2>⏱️ Stopwatch</h2>
-      <div class="time-display" id="stopwatchDisplay">00:00:00</div>
-      <div class="timers">
-        <button onclick="startStopwatch()">Start</button>
-        <button onclick="pauseStopwatch()">Pause</button>
-        <button onclick="resetStopwatch()">Reset</button>
-      </div>
-    </div>
-
-    <!-- Countdown Timer -->
-    <div class="card">
-      <h2>⏳ Countdown Timer</h2>
-      <input type="number" id="countdownInput" placeholder="Enter time in seconds" />
-      <div class="time-display" id="countdownDisplay">00:00</div>
-      <div class="timers">
-        <button onclick="startCountdown()">Start</button>
-        <button onclick="resetCountdown()">Reset</button>
-      </div>
-    </div>
-
-    <!-- Pomodoro -->
-    <div class="card">
-      <h2>🍅 Pomodoro Timer</h2>
-      <div class="time-display" id="pomodoroDisplay">25:00</div>
-      <div class="timers">
-        <button onclick="startPomodoro()">Start</button>
-        <button onclick="pausePomodoro()">Pause</button>
-        <button onclick="resetPomodoro()">Reset</button>
-      </div>
-      <div class="analytics" id="pomodoroStats"></div>
-    </div>
-
-    <!-- Focus Mode -->
-    <div class="card">
-      <h2>🎯 Focus Mode</h2>
-      <div class="timers">
-        <button onclick="enterFocusMode()">Enter Focus Mode</button>
-        <button onclick="toggleDND()">Toggle Do Not Disturb</button>
-      </div>
-    </div>
-
-    <!-- Mood Themes + Sounds -->
-    <div class="card">
-      <h2>🎵 Mood & Sounds</h2>
-      <select onchange="changeMood(this.value)">
-        <option disabled selected>Choose a mood</option>
-        <option>Happy</option>
-        <option>Chill</option>
-        <option>Focused</option>
-      </select>
-      <select onchange="playSound(this.value)">
-        <option disabled selected>Play Ambient Sound</option>
-        <option value="rain">Rain</option>
-        <option value="cafe">Cafe</option>
-        <option value="forest">Forest</option>
-      </select>
-    </div>
-
-    <!-- Study Challenges -->
-    <div class="card challenge">
-      <h2>🎮 Mini Study Challenges</h2>
-      <ul>
-        <li>25-min Deep Work session</li>
-        <li>Finish 3 Pomodoros today</li>
-        <li>No social media for 1 hour</li>
-      </ul>
-    </div>
-
-    <!-- Analytics -->
-    <div class="card">
-      <h2>📈 Daily Analytics</h2>
-      <canvas id="analyticsChart" width="400" height="200"></canvas>
-    </div>
-
+  <!-- Theme & DND -->
+  <div class="timer-section">
+    <h2>🧠 Settings</h2>
+    <button class="btn" onclick="toggleTheme()">Toggle Dark Mode</button>
+    <button class="btn" onclick="toggleDND()">Do Not Disturb</button>
+    <select class="theme-select" onchange="changeMood(this.value)">
+      <option value="">Mood Theme</option>
+      <option value="focus">Focused</option>
+      <option value="happy">Happy</option>
+      <option value="chill">Chill</option>
+    </select>
+    <select class="sound-select" onchange="playAmbient(this.value)">
+      <option value="">Ambient Sounds</option>
+      <option value="rain">Rain</option>
+      <option value="forest">Forest</option>
+      <option value="cafe">Cafe</option>
+    </select>
   </div>
 
-  <div class="focus-mode" id="focusOverlay">
-    <h1>🧘 Focus Mode</h1>
-    <div class="quote" id="focusQuote">"Stay focused. Stay humble."</div>
-    <button onclick="exitFocusMode()">Exit</button>
+  <!-- Stopwatch -->
+  <div class="timer-section">
+    <h2>⏱️ Stopwatch</h2>
+    <div id="stopwatch">00:00:00</div>
+    <div class="flex">
+      <button class="btn" onclick="startStopwatch()">Start</button>
+      <button class="btn" onclick="pauseStopwatch()">Pause</button>
+      <button class="btn" onclick="resetStopwatch()">Reset</button>
+    </div>
   </div>
 
-  <audio id="rain" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
-  <audio id="cafe" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" loop></audio>
-  <audio id="forest" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" loop></audio>
+  <!-- Countdown -->
+  <div class="timer-section">
+    <h2>⌛ Countdown</h2>
+    <input type="number" id="countdownInput" placeholder="Minutes" />
+    <div id="countdown">00:00</div>
+    <div class="flex">
+      <button class="btn" onclick="startCountdown()">Start</button>
+      <button class="btn" onclick="resetCountdown()">Reset</button>
+    </div>
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Pomodoro -->
+  <div class="timer-section">
+    <h2>🍅 Pomodoro</h2>
+    <div id="pomodoro">25:00</div>
+    <div class="flex">
+      <button class="btn" onclick="startPomodoro()">Start</button>
+      <button class="btn" onclick="pausePomodoro()">Pause</button>
+      <button class="btn" onclick="resetPomodoro()">Reset</button>
+    </div>
+    <p>Pomodoros done: <span id="pomodoroCount">0</span></p>
+  </div>
+
+  <!-- Focus Mode -->
+  <div class="timer-section">
+    <h2>🎯 Focus Mode</h2>
+    <button class="btn" onclick="enterFocusMode()">Enter Focus Mode</button>
+  </div>
+  <div id="focusOverlay" class="fullscreen" style="display:none;" onclick="exitFocusMode()">
+    “Stay focused. Your future self will thank you.”
+  </div>
+
+  <!-- Mini Challenges -->
+  <div class="timer-section">
+    <h2>✅ Mini Study Challenges</h2>
+    <input type="text" id="challengeInput" placeholder="New challenge..." />
+    <button class="btn" onclick="addChallenge()">Add</button>
+    <div id="challengeList"></div>
+  </div>
+
+  <!-- Analytics -->
+  <div class="timer-section">
+    <h2>📊 Daily Session Analytics</h2>
+    <p>Time Studied Today: <span id="studyTime">0 mins</span></p>
+    <div class="progress-bar"><div class="progress" id="studyProgress"></div></div>
+  </div>
+
   <script>
-    // Dark mode toggle
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
     // Stopwatch
-    let stopwatchTime = 0, stopwatchRunning = false, stopwatchInterval;
-    function formatTime(t) {
-      const h = String(Math.floor(t / 3600)).padStart(2, '0');
-      const m = String(Math.floor((t % 3600) / 60)).padStart(2, '0');
-      const s = String(t % 60).padStart(2, '0');
-      return `${h}:${m}:${s}`;
+    let swInterval, swTime = 0;
+    function updateStopwatch() {
+      swTime++;
+      const h = String(Math.floor(swTime / 3600)).padStart(2, '0');
+      const m = String(Math.floor((swTime % 3600) / 60)).padStart(2, '0');
+      const s = String(swTime % 60).padStart(2, '0');
+      document.getElementById('stopwatch').textContent = `${h}:${m}:${s}`;
+      updateAnalytics(1);
     }
-    function startStopwatch() {
-      if (!stopwatchRunning) {
-        stopwatchRunning = true;
-        stopwatchInterval = setInterval(() => {
-          stopwatchTime++;
-          document.getElementById('stopwatchDisplay').innerText = formatTime(stopwatchTime);
-        }, 1000);
-      }
-    }
-    function pauseStopwatch() {
-      clearInterval(stopwatchInterval);
-      stopwatchRunning = false;
-    }
-    function resetStopwatch() {
-      pauseStopwatch();
-      stopwatchTime = 0;
-      document.getElementById('stopwatchDisplay').innerText = '00:00:00';
-    }
+    function startStopwatch() { clearInterval(swInterval); swInterval = setInterval(updateStopwatch, 1000); }
+    function pauseStopwatch() { clearInterval(swInterval); }
+    function resetStopwatch() { pauseStopwatch(); swTime = 0; updateStopwatch(); }
 
     // Countdown
-    let countdownInterval;
+    let cdInterval, cdTime = 0;
     function startCountdown() {
-      let t = parseInt(document.getElementById('countdownInput').value);
-      countdownInterval = setInterval(() => {
-        if (t <= 0) {
-          clearInterval(countdownInterval);
-          alert("⏰ Time's up!");
-        }
-        document.getElementById('countdownDisplay').innerText = formatTime(t);
-        t--;
+      cdTime = parseInt(document.getElementById('countdownInput').value) * 60;
+      cdInterval = setInterval(() => {
+        if (cdTime <= 0) { clearInterval(cdInterval); alert("Time's up!"); return; }
+        cdTime--;
+        const m = String(Math.floor(cdTime / 60)).padStart(2, '0');
+        const s = String(cdTime % 60).padStart(2, '0');
+        document.getElementById('countdown').textContent = `${m}:${s}`;
+        updateAnalytics(1);
       }, 1000);
     }
-    function resetCountdown() {
-      clearInterval(countdownInterval);
-      document.getElementById('countdownDisplay').innerText = '00:00';
-    }
+    function resetCountdown() { clearInterval(cdInterval); document.getElementById('countdown').textContent = '00:00'; }
 
     // Pomodoro
-    let pomoTime = 1500, pomoRunning = false, pomoInterval, pomoRounds = 0;
-    function startPomodoro() {
-      if (!pomoRunning) {
-        pomoRunning = true;
-        pomoInterval = setInterval(() => {
-          if (pomoTime <= 0) {
-            pomoRounds++;
-            document.getElementById('pomodoroStats').innerText = `✅ Rounds completed: ${pomoRounds}`;
-            pomoTime = pomoRounds % 4 === 0 ? 900 : 300;
-          }
-          document.getElementById('pomodoroDisplay').innerText = formatTime(pomoTime);
-          pomoTime--;
-        }, 1000);
-      }
+    let pomoInterval, pomoTime = 1500, pomoCount = 0;
+    function updatePomodoro() {
+      if (pomoTime <= 0) { pomoCount++; document.getElementById('pomodoroCount').textContent = pomoCount; resetPomodoro(); return; }
+      pomoTime--;
+      const m = String(Math.floor(pomoTime / 60)).padStart(2, '0');
+      const s = String(pomoTime % 60).padStart(2, '0');
+      document.getElementById('pomodoro').textContent = `${m}:${s}`;
+      updateAnalytics(1);
     }
-    function pausePomodoro() {
-      clearInterval(pomoInterval);
-      pomoRunning = false;
+    function startPomodoro() { clearInterval(pomoInterval); pomoInterval = setInterval(updatePomodoro, 1000); }
+    function pausePomodoro() { clearInterval(pomoInterval); }
+    function resetPomodoro() { pausePomodoro(); pomoTime = 1500; document.getElementById('pomodoro').textContent = '25:00'; }
+
+    // Mood & Theme
+    function toggleTheme() {
+      const current = document.body.getAttribute("data-theme");
+      document.body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
     }
-    function resetPomodoro() {
-      pausePomodoro();
-      pomoTime = 1500;
-      pomoRounds = 0;
-      document.getElementById('pomodoroDisplay').innerText = '25:00';
-      document.getElementById('pomodoroStats').innerText = '';
+
+    function changeMood(mood) {
+      if (mood === "happy") document.body.style.background = "#fcefee";
+      else if (mood === "focus") document.body.style.background = "#f1f7fc";
+      else if (mood === "chill") document.body.style.background = "#e8fdf5";
+      else document.body.style.background = "";
+    }
+
+    // DND
+    function toggleDND() {
+      alert("🔕 Do Not Disturb toggled (for now just a placeholder)");
+    }
+
+    // Ambient
+    let ambientAudio;
+    function playAmbient(type) {
+      if (ambientAudio) ambientAudio.pause();
+      if (!type) return;
+      ambientAudio = new Audio(`https://assets.mixkit.co/sfx/preview/mixkit-${type}-sound-1.mp3`);
+      ambientAudio.loop = true;
+      ambientAudio.play();
     }
 
     // Focus Mode
     function enterFocusMode() {
-      document.getElementById('focusOverlay').style.display = 'flex';
+      document.getElementById("focusOverlay").style.display = "flex";
     }
     function exitFocusMode() {
-      document.getElementById('focusOverlay').style.display = 'none';
-    }
-    function toggleDND() {
-      alert("🔕 DND Mode is ON (mute notifications manually)");
+      document.getElementById("focusOverlay").style.display = "none";
     }
 
-    // Mood and Sounds
-    function changeMood(mood) {
-      const colors = {
-        Happy: '#fff4e6',
-        Chill: '#e6f7f9',
-        Focused: '#f3f0ff'
-      };
-      document.body.style.background = colors[mood] || '#fff';
+    // Mini Challenges
+    let challenges = JSON.parse(localStorage.getItem("challenges") || "[]");
+    function renderChallenges() {
+      const list = document.getElementById("challengeList");
+      list.innerHTML = "";
+      challenges.forEach((c, i) => {
+        const div = document.createElement("div");
+        div.className = "checklist-item";
+        div.innerHTML = `
+          <input type="checkbox" ${c.done ? "checked" : ""} onchange="toggleChallenge(${i})">
+          <span>${c.text}</span>
+          <button onclick="deleteChallenge(${i})">🗑️</button>
+        `;
+        list.appendChild(div);
+      });
     }
-    function playSound(type) {
-      ['rain', 'cafe', 'forest'].forEach(id => document.getElementById(id).pause());
-      if (type) document.getElementById(type).play();
+    function addChallenge() {
+      const input = document.getElementById("challengeInput");
+      if (input.value.trim()) {
+        challenges.push({ text: input.value.trim(), done: false });
+        input.value = "";
+        saveChallenges();
+      }
+    }
+    function toggleChallenge(i) { challenges[i].done = !challenges[i].done; saveChallenges(); }
+    function deleteChallenge(i) { challenges.splice(i, 1); saveChallenges(); }
+    function saveChallenges() {
+      localStorage.setItem("challenges", JSON.stringify(challenges));
+      renderChallenges();
     }
 
-    // Chart
-    const ctx = document.getElementById('analyticsChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        datasets: [{
-          label: 'Minutes Studied',
-          data: [25, 50, 30, 60, 45, 75, 90],
-          backgroundColor: '#ffc0cb'
-        }]
-      },
-      options: { responsive: true }
-    });
+    // Analytics
+    let studyMinutes = parseInt(localStorage.getItem("studyMinutes") || "0");
+    function updateAnalytics(mins) {
+      studyMinutes += mins / 60;
+      localStorage.setItem("studyMinutes", Math.floor(studyMinutes));
+      document.getElementById("studyTime").textContent = Math.floor(studyMinutes) + " mins";
+      document.getElementById("studyProgress").style.width = (Math.min(studyMinutes, 120) / 120) * 100 + "%";
+    }
+
+    // Init
+    updateStopwatch();
+    renderChallenges();
+    updateAnalytics(0);
   </script>
 </body>
 </html>
