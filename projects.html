@@ -2,90 +2,254 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projects | My College Site</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="projects.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Projects</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-light: #fdf8f5;
+      --bg-dark: #1e1e1e;
+      --text-light: #333;
+      --text-dark: #f0f0f0;
+      --card-light: #ffffff;
+      --card-dark: #2c2c2c;
+      --accent: #bdaaff;
+      --border-light: #ddd;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    nav {
+      padding: 0.5rem 1rem;
+      background: #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav a {
+      margin-right: 15px;
+      text-decoration: none;
+      color: #444;
+      font-weight: 500;
+    }
+
+    .toggle-dark {
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .project-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .project-form input, .project-form textarea {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border-light);
+      border-radius: 5px;
+    }
+
+    .project-form button {
+      padding: 10px 15px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .project-card {
+      background-color: var(--card-light);
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+
+    body.dark .project-card {
+      background-color: var(--card-dark);
+    }
+
+    .project-card h3 {
+      margin: 0;
+    }
+
+    .project-card p {
+      margin: 0.5rem 0;
+    }
+
+    .project-card a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .checklist {
+      margin-top: 2rem;
+    }
+
+    .checklist input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      margin-right: 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border-light);
+    }
+
+    .checklist button {
+      padding: 10px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    ul.checklist-items {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.checklist-items li {
+      background: var(--card-light);
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    body.dark ul.checklist-items li {
+      background: var(--card-dark);
+    }
+
+    ul.checklist-items li input {
+      margin-right: 10px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding: 1rem;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>My College Projects</h1>
-    <nav>
+  <header>My College Projects</header>
+  <nav>
+    <div>
       <a href="index.html">Home</a>
       <a href="notes.html">Notes</a>
       <a href="todo.html">To-Do</a>
-      <a href="projects.html" class="active">Projects</a>
-    </nav>
-  </header>
+      <a href="projects.html"><strong>Projects</strong></a>
+    </div>
+    <div class="toggle-dark" onclick="toggleDarkMode()">
+      <i class="fas fa-moon"></i>
+    </div>
+  </nav>
 
-  <main>
-    <section>
-      <h2 class="section-title">📁 My Projects</h2>
+  <div class="container">
+    <h2>📁 My Projects</h2>
 
-      <div id="project-list" class="project-grid"></div>
+    <form class="project-form" id="projectForm">
+      <input type="text" id="title" placeholder="Project Title" required />
+      <textarea id="description" rows="1" placeholder="Short Description"></textarea>
+      <input type="text" id="technologies" placeholder="Technologies (HTML, CSS, JS)" />
+      <input type="url" id="link" placeholder="GitHub or Demo URL" />
+      <button type="submit"><i class="fas fa-plus"></i> Add Project</button>
+    </form>
 
-      <div class="project-form">
-        <h3>Add a New Project</h3>
-        <input type="text" id="project-title" placeholder="Project Title" required />
-        <textarea id="project-description" placeholder="Short Description" required></textarea>
-        <input type="text" id="project-tech" placeholder="Technologies (HTML, CSS, JS)" />
-        <input type="url" id="project-link" placeholder="GitHub or Demo URL" />
-        <button onclick="addProject()">➕ Add Project</button>
-      </div>
-    </section>
-  </main>
+    <div id="projectsContainer"></div>
 
-  <footer>
-    <p>&copy; 2025 My College Site</p>
-  </footer>
+    <div class="checklist">
+      <h2>📝 Project Idea Checklist</h2>
+      <input type="text" id="checkInput" placeholder="Enter a project idea..." />
+      <button onclick="addCheckItem()">Add Idea</button>
+      <ul class="checklist-items" id="checklist"></ul>
+    </div>
+  </div>
+
+  <footer>&copy; 2025 My College Site</footer>
 
   <script>
-    const projectList = document.getElementById('project-list');
+    const darkToggle = document.querySelector('.toggle-dark');
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+    }
 
-    function addProject() {
-      const title = document.getElementById('project-title').value.trim();
-      const desc = document.getElementById('project-description').value.trim();
-      const tech = document.getElementById('project-tech').value.trim();
-      const link = document.getElementById('project-link').value.trim();
+    const projectForm = document.getElementById("projectForm");
+    const projectsContainer = document.getElementById("projectsContainer");
+    const checklist = document.getElementById("checklist");
 
-      if (!title || !desc) return alert("Title and Description are required");
+    projectForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const desc = document.getElementById("description").value;
+      const tech = document.getElementById("technologies").value;
+      const link = document.getElementById("link").value;
 
-      const card = document.createElement('div');
-      card.className = 'project-card';
-
+      const card = document.createElement("div");
+      card.className = "project-card";
       card.innerHTML = `
         <h3>${title}</h3>
         <p>${desc}</p>
         <p><strong>Tech:</strong> ${tech}</p>
-        ${link ? `<a href="${link}" target="_blank">🔗 Visit</a>` : ""}
+        <p><a href="${link}" target="_blank">View Project 🔗</a></p>
       `;
 
-      projectList.appendChild(card);
+      projectsContainer.prepend(card);
+      projectForm.reset();
+    });
 
-      const saved = JSON.parse(localStorage.getItem('projects') || '[]');
-      saved.push({ title, desc, tech, link });
-      localStorage.setItem('projects', JSON.stringify(saved));
+    function addCheckItem() {
+      const val = document.getElementById("checkInput").value;
+      if (!val) return;
 
-      document.getElementById('project-title').value = '';
-      document.getElementById('project-description').value = '';
-      document.getElementById('project-tech').value = '';
-      document.getElementById('project-link').value = '';
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <label><input type="checkbox"> ${val}</label>
+        <button onclick="this.parentElement.remove()">❌</button>
+      `;
+      checklist.appendChild(li);
+      document.getElementById("checkInput").value = "";
     }
-
-    window.onload = () => {
-      const saved = JSON.parse(localStorage.getItem('projects') || '[]');
-      saved.forEach(({ title, desc, tech, link }) => {
-        const card = document.createElement('div');
-        card.className = 'project-card';
-        card.innerHTML = `
-          <h3>${title}</h3>
-          <p>${desc}</p>
-          <p><strong>Tech:</strong> ${tech}</p>
-          ${link ? `<a href="${link}" target="_blank">🔗 Visit</a>` : ""}
-        `;
-        projectList.appendChild(card);
-      });
-    };
   </script>
 </body>
 </html>
